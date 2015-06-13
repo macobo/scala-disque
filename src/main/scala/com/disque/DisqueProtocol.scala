@@ -4,8 +4,9 @@ import com.redis.Protocol
 import com.redis.serialization.Parse.{Implicits => Parsers}
 
 sealed trait Response
-case class SimpleString(s: String) extends Response
-case class BulkString(s: String) extends Response
+sealed trait StringResponse { def s: String }
+case class SimpleString(s: String) extends Response with StringResponse
+case class BulkString(s: String) extends Response with StringResponse
 case class Integer(n: Long) extends Response
 case class Error(reason: String) extends Response
 case class Multi(results: List[Response]) extends Response
