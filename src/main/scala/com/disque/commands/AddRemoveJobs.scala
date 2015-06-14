@@ -35,12 +35,12 @@ trait AddRemoveJobs { self: Disque =>
   def queueLength(queueName: String): Long =
     send("QLEN", Seq(queueName))(as(integerResponse).n)
 
-
-  def getJob(queueName: String, timeout: Option[Int] = Some(100)): Option[Job[String]] = {
+  def getJobMulti(queueNames: Seq[String], timeout: Option[Int] = Some(100)): Option[Job[String]] = {
     val args = (timeout match {
       case Some(t) => List("TIMEOUT", t)
       case None => Nil
-    }) ++ List("FROM", queueName)
+    }) :+ "FROM" ++ queueNames
+
     val response = send("GETJOB", args)(as(multiResponse orElse bulkResponse))
     response match {
       case Multi(List(job: Multi)) => Some(parseJob(job))
@@ -48,6 +48,9 @@ trait AddRemoveJobs { self: Disque =>
     }
   }
 
+  def getJob(queueName: String, timeout: Option[Int] = Some(100)): Option[Job[String]] =
+    getJobMulti(Seq(queueName), timeout)
+  
   def peek(queueName: String, count: Int = 10): List[Job[String]] = {
     val response = send("QPEEK", Seq(queueName, count))(as(multiResponse))
     parseJobList(response)
