@@ -24,10 +24,10 @@ trait AddRemoveJobs { self: Disque =>
     JobId(resp.s)
   }
 
-  def deleteJob(queueName: String, jobId: JobId): Boolean =
-    deleteJobs(queueName, List(jobId)) == 1
+  def deleteJob(jobId: JobId): Boolean =
+    deleteJobs(List(jobId)) == 1
 
-  def deleteJobs(queueName: String, jobs: Seq[JobId]): Long = {
+  def deleteJobs(jobs: Seq[JobId]): Long = {
     val ids = jobs.map { _.id }
     send("DELJOB", ids)(as(integerResponse).n)
   }
@@ -36,21 +36,22 @@ trait AddRemoveJobs { self: Disque =>
     send("QLEN", Seq(queueName))(as(integerResponse).n)
 
   def getJobMulti(queueNames: Seq[String], timeout: Option[Int] = Some(100)): Option[Job[String]] = {
-    val args = (timeout match {
+    val args = ((timeout match {
       case Some(t) => List("TIMEOUT", t)
       case None => Nil
-    }) :+ "FROM" ++ queueNames
+    }) :+ "FROM") ++ queueNames
 
     val response = send("GETJOB", args)(as(multiResponse orElse bulkResponse))
     response match {
       case Multi(List(job: Multi)) => Some(parseJob(job))
+      case Multi(Nil) => None
       case NullResponse() => None
     }
   }
 
   def getJob(queueName: String, timeout: Option[Int] = Some(100)): Option[Job[String]] =
     getJobMulti(Seq(queueName), timeout)
-  
+
   def peek(queueName: String, count: Int = 10): List[Job[String]] = {
     val response = send("QPEEK", Seq(queueName, count))(as(multiResponse))
     parseJobList(response)
