@@ -9,4 +9,10 @@ trait AddRemoveJobs { self: Disque =>
     val resp = send("ADDJOB", Seq(queueName, job, timeout)) { as(simpleStringResponse) }
     JobId(resp.s)
   }
+
+  def queueLength(queueName: String): Long =
+    send("QLEN", Seq(queueName))(as(integerResponse).n)
+
+  def getResponseType(command: String, arguments: Seq[Any]) =
+    send(command, arguments)(as(anyResponse))
 }
