@@ -13,7 +13,9 @@ case class NullResponse() extends BulkResponse
 
 case class Integer(n: Long) extends Response
 case class Error(reason: String) extends Response
-case class Multi(results: List[Response]) extends Response
+case class Multi(results: List[Response]) extends Response {
+  def apply(n: Int): Response = results(n)
+}
 
 // Re-implement much of the protocols used in Redis lib for a saner interface and to allow nesting of
 // multiResponses and to use a saner interface.

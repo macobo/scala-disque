@@ -6,7 +6,6 @@ case class TestProtocol(response: String) extends DisqueProtocol {
   var remainingMessage = response
   val SEP = "\r\n"
 
-
   override def readLine: Array[Byte] = {
 //    println(s"Reading from: [${escape(remainingMessage)}]")
     val index = remainingMessage.indexOf(SEP)
