@@ -1,11 +1,11 @@
-package com.disque
+package macobo.disque
 
-import com.disque.commands.{Job, JobId}
+import macobo.disque.commands.{Job, JobId}
 import org.scalatest.{BeforeAndAfterAll, MustMatchers, WordSpec}
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
+import scala.concurrent.{Await, Future}
 
 // These tests assume that disque is running on default port
 class AddRemoveJobsSpec extends WordSpec with MustMatchers with BeforeAndAfterAll {

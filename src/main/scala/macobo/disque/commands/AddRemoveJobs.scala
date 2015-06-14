@@ -1,6 +1,6 @@
-package com.disque.commands
+package macobo.disque.commands
 
-import com.disque.{BulkString, Disque, Multi}
+import macobo.disque.{BulkString, Multi, Disque}
 
 case class Job[T](value: T, id: JobId, source: Option[String] = None)
 

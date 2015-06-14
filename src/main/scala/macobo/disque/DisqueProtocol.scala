@@ -1,4 +1,4 @@
-package com.disque
+package macobo.disque
 
 import com.redis.Protocol
 import com.redis.serialization.Parse.{Implicits => Parsers}

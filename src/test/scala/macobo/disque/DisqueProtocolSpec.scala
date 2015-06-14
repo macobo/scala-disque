@@ -1,4 +1,4 @@
-package com.disque
+package macobo.disque
 
 import org.scalatest.{MustMatchers, WordSpec}
 

@@ -1,8 +1,8 @@
-package com.disque
+package macobo.disque
 
-import com.disque.commands.AddRemoveJobs
 import com.redis.Redis
 import com.redis.serialization.Parse.{Implicits => Parsers}
+import macobo.disque.commands.AddRemoveJobs
 
 trait Disque extends Redis with DisqueProtocol
 
