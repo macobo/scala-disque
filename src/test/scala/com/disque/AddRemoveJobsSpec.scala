@@ -3,6 +3,10 @@ package com.disque
 import com.disque.commands.{Job, JobId}
 import org.scalatest.{BeforeAndAfterAll, MustMatchers, WordSpec}
 
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{Await, Future}
+import scala.concurrent.duration._
+
 // These tests assume that disque is running on default port
 class AddRemoveJobsSpec extends WordSpec with MustMatchers with BeforeAndAfterAll {
   val client = new DisqueClient()
@@ -55,7 +59,24 @@ class AddRemoveJobsSpec extends WordSpec with MustMatchers with BeforeAndAfterAl
         val expectedJob = Job(jobDesc, jobId, Some(queueName))
 
         client.peek(queueName) must equal(List(expectedJob))
+        client.queueLength(queueName) must equal(1L)
         client.getJob(queueName) must equal(Some(expectedJob))
+        client.queueLength(queueName) must equal(0L)
+
+        client.deleteJob(jobId)
+      }
+
+      "getJob with unspecified timeout should block" in {
+        val future: Future[Job[String]] = Future {
+          client.getJob(queueName).get
+        }
+        Thread.sleep(50)
+        future.isCompleted must equal(false)
+
+        // Must use a different client since main one is busy
+        val jobId = (new DisqueClient()).addJob(queueName, "Hello world!", 5000)
+        val job = Await.result(future, 1.second)
+        job.value must equal("Hello world!")
 
         client.deleteJob(jobId)
       }

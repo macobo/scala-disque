@@ -1,6 +1,6 @@
 package com.disque.commands
 
-import com.disque.{NullResponse, BulkString, Multi, Disque}
+import com.disque.{BulkString, Disque, Multi}
 
 case class Job[T](value: T, id: JobId, source: Option[String] = None)
 
@@ -45,7 +45,6 @@ trait AddRemoveJobs { self: Disque =>
     response match {
       case Multi(List(job: Multi)) => Some(parseJob(job))
       case Multi(Nil) => None
-      case NullResponse() => None
     }
   }
 
@@ -57,6 +56,6 @@ trait AddRemoveJobs { self: Disque =>
     parseJobList(response)
   }
 
-  def getResponseType(command: String, arguments: Seq[Any]) =
-    send(command, arguments)(as(anyResponse))
+//  def getResponseType(command: String, arguments: Seq[Any]) =
+//    send(command, arguments)(as(anyResponse))
 }
