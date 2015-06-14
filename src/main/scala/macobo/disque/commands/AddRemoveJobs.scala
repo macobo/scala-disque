@@ -24,14 +24,6 @@ trait AddRemoveJobs { self: Disque =>
     JobId(resp.s)
   }
 
-  def deleteJob(jobId: JobId): Boolean =
-    deleteJobs(List(jobId)) == 1
-
-  def deleteJobs(jobs: Seq[JobId]): Long = {
-    val ids = jobs.map { _.id }
-    send("DELJOB", ids)(as(integerResponse).n)
-  }
-
   def queueLength(queueName: String): Long =
     send("QLEN", Seq(queueName))(as(integerResponse).n)
 
@@ -54,6 +46,20 @@ trait AddRemoveJobs { self: Disque =>
   def peek(queueName: String, count: Int = 10): List[Job[String]] = {
     val response = send("QPEEK", Seq(queueName, count))(as(multiResponse))
     parseJobList(response)
+  }
+
+  def acknowledge(jobIds: Seq[JobId]): Long =
+    send("ACKJOB", jobIds.map { _.id })(as(integerResponse).n)
+
+  def acknowledge(jobId: JobId): Boolean =
+    acknowledge(Seq(jobId)) == 1L
+
+  def deleteJob(jobId: JobId): Boolean =
+    deleteJobs(List(jobId)) == 1
+
+  def deleteJobs(jobs: Seq[JobId]): Long = {
+    val ids = jobs.map { _.id }
+    send("DELJOB", ids)(as(integerResponse).n)
   }
 
 //  def getResponseType(command: String, arguments: Seq[Any]) =

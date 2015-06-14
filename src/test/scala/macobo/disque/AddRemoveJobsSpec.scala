@@ -45,6 +45,12 @@ class AddRemoveJobsSpec extends WordSpec with MustMatchers with BeforeAndAfterAl
         client.deleteJob(jobId) must equal(true)
         client.queueLength(queueName) must equal(0L)
       }
+
+      "acking should remove from cluster" in {
+        jobId = client.addJob(queueName, "testJob", 10000)
+        client.acknowledge(jobId) must equal(true)
+        client.queueLength(queueName) must equal(0L)
+      }
     }
 
     "GETJOB and PEEK" should {
