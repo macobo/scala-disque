@@ -34,7 +34,12 @@ class AddRemoveJobsSpec extends WordSpec with MustMatchers with BeforeAndAfterAl
       }
 
       "deleteJob should return false if no jobs are removed" in {
-        client.deleteJob(queueName, fakeJobId)
+        client.deleteJob(queueName, fakeJobId) must equal(false)
+      }
+
+      "deleteJob should decrement job queue length" in {
+        client.deleteJob(queueName, jobId) must equal(true)
+        client.queueLength(queueName) must equal(0L)
       }
     }
   }
